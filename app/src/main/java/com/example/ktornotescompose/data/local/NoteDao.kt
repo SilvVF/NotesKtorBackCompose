@@ -1,5 +1,6 @@
 package com.example.ktornotescompose.data.local
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.ktornotescompose.data.local.entities.Note
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +23,7 @@ interface NoteDao {
     suspend fun deleteAllSyncedNotes()
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
-    fun observeNoteById(id: String): StateFlow<Note>
+    fun observeNoteById(id: String): LiveData<Note>
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: String): Note?

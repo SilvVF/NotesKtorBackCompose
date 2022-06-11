@@ -1,0 +1,49 @@
+{
+  ConstraintSets: {
+    start: {
+      //id referred to in code
+      loginText: { //define constraints and starting size
+        width: 'spread',
+        start: ['parent', 'start'], //16 = margin to parent
+        top: ['parent', 'top'],
+        bottom: ['loginBox', 'top']
+      },
+      loginBox: { //no width and height = wrap content
+        top: ['loginText', 'bottom'],
+        bottom: ['button', 'top'],
+        start: ['parent', 'start', 20],
+        end: ['parent', 'end', 20]
+      },
+      button: {
+        width: 'spread', //same as 0dp filling constraint
+        height: 'spread',
+        end: ['parent', 'end'],
+        top: ['loginBox', 'bottom', 20],
+      }
+    },
+
+    end: {
+      //id referred to in code
+      loginText: { //define constraints and starting size
+        width: '0',
+        height: '0',
+        top: ['parent','top'],
+        end: ['parent', 'end']
+      },
+      loginBox: { //no width and height = wrap content
+        width: '0',
+        height: '0',
+        top: ['parent','top'],
+        end: ['parent', 'end']
+      },
+      button: {
+        width: '0',
+        height: '0',
+        top: ['parent','top'],
+        end: ['parent', 'end']
+      }
+    },
+
+  },
+
+}
