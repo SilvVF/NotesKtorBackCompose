@@ -1,7 +1,6 @@
 package com.example.ktornotescompose.ui.screens.auth.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
@@ -11,13 +10,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginInfoBox(
+fun RegisterInfoBox(
     modifier: Modifier = Modifier,
     hint: String = "",
     email: String = "",
     password: String = "",
+    confirmPassword: String = "",
     emailChanged: (String) -> Unit,
     passwordChanged: (String) -> Unit,
+    confirmPasswordChanged: (String) -> Unit
 ) {
     var isHintEmailDisplayed by remember {
         mutableStateOf(hint != "")
@@ -59,6 +60,22 @@ fun LoginInfoBox(
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { isHintPasswordDisplayed = !it.isFocused && password.isEmpty() }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = confirmPassword,
+                onValueChange = {
+                    confirmPasswordChanged(it)
+                },
+                placeholder = {
+                    Text(
+                        text = "Confirm Password",
+                        color = Color.LightGray,
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isHintPasswordDisplayed = !it.isFocused && confirmPassword.isEmpty() }
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.example.ktornotescompose.ui.screens.auth
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
+import kotlin.math.abs
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -35,6 +37,29 @@ class AuthViewModel @Inject constructor(
             }
             is AuthScreenEvent.OnLoginButtonClick -> {
 
+            }
+            is AuthScreenEvent.OnRegisterPasswordChanged -> {
+                state = state.copy(
+                    passwordRegister = event.password
+                )
+            }
+            is AuthScreenEvent.OnRegisterEmailChanged -> {
+                state = state.copy(
+                    emailRegister = event.email
+                )
+            }
+            is AuthScreenEvent.OnConfirmPasswordChanged -> {
+                state = state.copy(
+                    confirmPassword = event.password
+                )
+            }
+            is AuthScreenEvent.OnRegisterButtonClick -> {
+
+            }
+            is AuthScreenEvent.Expanded -> {
+                state = state.copy(
+                    isExpanded = event.isExpanded
+                )
             }
         }
     }

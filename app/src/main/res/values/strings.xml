@@ -2,4 +2,9 @@
     <string name="app_name">KtorNotesCompose</string>
     <string name="login_existing_account">Login with an existing Account</string>
     <string name="login">LOGIN</string>
+<string name="register_account">Don\'t have an account? \n
+    Click up to register!</string>
+    <string name="register">REGISTER</string>
+    <string name="already_has_account">Already have an account? \n
+    Click down to sign in!</string>
 </resources>
