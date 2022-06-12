@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.example.ktornotescompose.R
 import com.example.ktornotescompose.ui.screens.auth.AuthScreenEvent
 import com.example.ktornotescompose.ui.screens.auth.AuthViewModel
-import com.example.ktornotescompose.ui.screens.auth.RegisterContainer
 
 @Composable
 fun ExistingAccount(
