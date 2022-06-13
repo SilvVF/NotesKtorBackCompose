@@ -21,12 +21,16 @@ import com.example.ktornotescompose.ui.screens.auth.components.RegisterContainer
 @Composable
 fun AuthScreen(
     scaffoldState: ScaffoldState,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
+    OnSuccessfulLogin: () -> Unit
 ) {
     val state = viewModel.state
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
-        viewModel.subscribe()
+        viewModel.subscribeToRegisterStatus()
+    }
+    LaunchedEffect(key1 = true) {
+        viewModel.subscribeToLoginStatus()
     }
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
@@ -36,6 +40,7 @@ fun AuthScreen(
                         message = event.message.asString(context)
                     )
                 }
+                is UiEvent.NavigateUp -> OnSuccessfulLogin()
                 else -> {
 
                 }

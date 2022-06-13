@@ -1,16 +1,18 @@
 package com.example.ktornotescompose.ui.screens.auth
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.example.ktornotescompose.data.remote.BasicAuthInterceptor
 import com.example.ktornotescompose.repositories.NoteRepository
 import com.example.ktornotescompose.ui.navigation.UiEvent
 import com.example.ktornotescompose.ui.navigation.UiText
+import com.example.ktornotescompose.util.Constants
+import com.example.ktornotescompose.util.Constants.KEY_LOGGED_IN_EMAIL
+import com.example.ktornotescompose.util.Constants.KEY_LOGGED_IN_PASSWORD
 import com.example.ktornotescompose.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +26,13 @@ import kotlin.math.abs
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val sharedPref: SharedPreferences,
+    private val basicAuthInterceptor: BasicAuthInterceptor
 ): ViewModel() {
+
+    private var currEmail: String? = null
+    private var currPassword: String? = null
 
     var state by mutableStateOf(AuthState())
         private set
@@ -34,9 +41,12 @@ class AuthViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     private val _registerStatus = MutableSharedFlow<Resource<String>>()
-    private val registerStatus = _registerStatus.asSharedFlow()
+    val registerStatus = _registerStatus.asSharedFlow()
 
-    suspend fun subscribe(): Unit = registerStatus.collect { result ->
+    private val _loginStatus = MutableSharedFlow<Resource<String>>()
+    val loginStatus = _loginStatus.asSharedFlow()
+
+    suspend fun subscribeToRegisterStatus(): Unit = registerStatus.collect { result ->
          when (result) {
             is Resource.Loading -> {
                 state = state.copy(
@@ -68,6 +78,42 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    suspend fun subscribeToLoginStatus(): Unit = loginStatus.collect { result ->
+        when (result) {
+            is Resource.Loading -> {
+                state = state.copy(
+                    shouldShowProgressbar = true
+                )
+            }
+            is Resource.Success -> {
+                state = state.copy(
+                    shouldShowProgressbar = false
+                )
+                _uiEvent.send(
+                    UiEvent.ShowSnackBar(
+                        UiText.DynamicString(result.data ?: "Successfully Logged in to account")
+                    )
+                )
+                sharedPref.edit().putString(KEY_LOGGED_IN_EMAIL, currEmail).apply()
+                sharedPref.edit().putString(KEY_LOGGED_IN_PASSWORD, currPassword).apply()
+                basicAuthInterceptor.email = currEmail ?: ""
+                basicAuthInterceptor.password = currPassword ?: ""
+                _uiEvent.send(UiEvent.NavigateUp)
+            }
+            is Resource.Error -> {
+                delay(500)
+                state = state.copy(
+                    shouldShowProgressbar = false
+                )
+                _uiEvent.send(
+                    UiEvent.ShowSnackBar(
+                        UiText.DynamicString(result.message ?: "An Unknown Error Occurred")
+                    )
+                )
+            }
+        }
+    }
+
     fun onEvent(event: AuthScreenEvent) {
         when (event) {
             is AuthScreenEvent.OnEmailChanged -> {
@@ -81,7 +127,12 @@ class AuthViewModel @Inject constructor(
                 )
             }
             is AuthScreenEvent.OnLoginButtonClick -> {
-
+                currEmail = state.email
+                currPassword = state.password
+                login(
+                    email = state.email,
+                    password = state.password
+                )
             }
             is AuthScreenEvent.OnRegisterPasswordChanged -> {
                 state = state.copy(
@@ -113,7 +164,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun register(email: String, password: String, repeatedPassword: String) = viewModelScope.launch {
+    private fun register(email: String, password: String, repeatedPassword: String) = viewModelScope.launch {
         _registerStatus.emit(Resource.Loading())
         if (email.isEmpty() || repeatedPassword.isEmpty() || repeatedPassword.isEmpty()){
             _registerStatus.emit(Resource.Error("Some Fields Are empty", null))
@@ -125,5 +176,14 @@ class AuthViewModel @Inject constructor(
         }
         val result = noteRepository.registerUser(email, password)
         _registerStatus.emit(result)
+    }
+    private fun login(email: String, password: String) = viewModelScope.launch {
+        _loginStatus.emit(Resource.Loading())
+        if (email.isEmpty() || password.isEmpty()){
+            _loginStatus.emit(Resource.Error("Some Fields Are empty", null))
+            return@launch
+        }
+        val result = noteRepository.loginUser(email, password)
+        _loginStatus.emit(result)
     }
 }

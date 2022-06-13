@@ -7,4 +7,5 @@
     <string name="register">REGISTER</string>
     <string name="already_has_account">Already have an account? \n
     Click down to sign in!</string>
+    <string name="all_notes">All Notes</string>
 </resources>

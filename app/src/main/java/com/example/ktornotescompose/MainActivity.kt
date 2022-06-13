@@ -29,7 +29,14 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = Routes.AUTH_ROUTE) {
                         composable(Routes.AUTH_ROUTE) {
-                            AuthScreen(scaffoldState = scaffoldState)
+                            AuthScreen(
+                                scaffoldState = scaffoldState,
+                                OnSuccessfulLogin = {
+                                    navController.popBackStack()
+                                    navController.navigate(Routes.NOTES_ROUTE)
+                                }
+                            )
+
                         }
                         composable(Routes.NOTES_ROUTE){
                             NoteScreen(scaffoldState = scaffoldState)
