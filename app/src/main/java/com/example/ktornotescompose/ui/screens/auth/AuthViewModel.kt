@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ktornotescompose.data.remote.BasicAuthInterceptor
 import com.example.ktornotescompose.repositories.NoteRepository
 import com.example.ktornotescompose.ui.navigation.UiEvent
@@ -45,6 +46,8 @@ class AuthViewModel @Inject constructor(
 
     private val _loginStatus = MutableSharedFlow<Resource<String>>()
     val loginStatus = _loginStatus.asSharedFlow()
+
+
 
     suspend fun subscribeToRegisterStatus(): Unit = registerStatus.collect { result ->
          when (result) {
@@ -96,8 +99,7 @@ class AuthViewModel @Inject constructor(
                 )
                 sharedPref.edit().putString(KEY_LOGGED_IN_EMAIL, currEmail).apply()
                 sharedPref.edit().putString(KEY_LOGGED_IN_PASSWORD, currPassword).apply()
-                basicAuthInterceptor.email = currEmail ?: ""
-                basicAuthInterceptor.password = currPassword ?: ""
+                authenticateApi(currEmail?: "", currPassword?: "")
                 _uiEvent.send(UiEvent.NavigateUp)
             }
             is Resource.Error -> {
@@ -185,5 +187,9 @@ class AuthViewModel @Inject constructor(
         }
         val result = noteRepository.loginUser(email, password)
         _loginStatus.emit(result)
+    }
+    private fun authenticateApi(email: String, password: String) {
+        basicAuthInterceptor.email = email
+        basicAuthInterceptor.password = password
     }
 }
