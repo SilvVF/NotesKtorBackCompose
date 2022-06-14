@@ -42,7 +42,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideBasicAuthInterceptor() = BasicAuthInterceptor()
+    fun provideBasicAuthInterceptor(): BasicAuthInterceptor {
+        return BasicAuthInterceptor()
+    }
 
     @Provides
     @Singleton

@@ -7,5 +7,6 @@ data class AuthState(
     val emailRegister: String = "",
     val passwordRegister: String = "",
     val confirmPassword: String = "",
-    val isExpanded: Boolean = false
+    val isExpanded: Boolean = false,
+    val shouldShowProgressbar: Boolean = false
 )
