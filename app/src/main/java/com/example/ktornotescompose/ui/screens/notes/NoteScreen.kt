@@ -113,6 +113,7 @@ fun NoteScreen(
                     ) {
                        onNoteClicked(it.id)
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
             FloatingActionButton(

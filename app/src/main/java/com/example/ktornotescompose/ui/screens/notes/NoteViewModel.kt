@@ -5,6 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.ktornotescompose.data.local.entities.Note
 import com.example.ktornotescompose.repositories.NoteRepository
 import com.example.ktornotescompose.ui.navigation.UiEvent
 import com.example.ktornotescompose.ui.navigation.UiText
@@ -15,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,6 +26,7 @@ class NoteViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val repository: NoteRepository
 ): ViewModel() {
+
 
     var state by mutableStateOf(NoteScreenState())
         private set
@@ -32,12 +37,11 @@ class NoteViewModel @Inject constructor(
     private val _forceUpdate = MutableStateFlow(false)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _allNotes = _forceUpdate.flatMapLatest {
-        repository.getAllNotes().flatMapLatest {
-            MutableStateFlow(Event(it))
-        }
+        repository.getAllNotes()
+    }.flatMapLatest {
+        MutableStateFlow(Event(it))
     }
     val allNotes = _allNotes
-
     suspend fun subscribeToNotes() {
         allNotes.collect { event ->
             val result = event.peekContent()

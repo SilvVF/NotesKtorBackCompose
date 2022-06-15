@@ -53,6 +53,25 @@ class NoteRepository @Inject constructor(
         }
         return Resource.Error("Couldn't connect to the server check internet", null)
     }
+    suspend fun insertNote(note: Note) {
+        //insert note into backend server
+        val response = try {
+            noteApi.addNote(note)
+        } catch (e: Exception) {
+            null
+        }
+        //save the note locally in DB and set sync based on server response
+        response?.let {
+            if (response.isSuccessful){
+                noteDao.insert(note.apply { isSynced = true })
+            } else {
+                noteDao.insert(note.apply { isSynced = false })
+            }
+        }
+    }
+    suspend fun insertNotes (noteList: List<Note>){
+        noteList.forEach { insertNote(it) }
+    }
     fun getAllNotes(): Flow<Resource<List<Note>>> {
         return networkBoundResource(
             query = {
@@ -64,7 +83,7 @@ class NoteRepository @Inject constructor(
             saveFetchResult = { response ->
                 if (response.isSuccessful) {
                     response.body()?.let { notes ->
-                        noteDao.insertListNotes(notes)
+                        insertNotes(notes)
                     }
                 }
             },
@@ -73,4 +92,5 @@ class NoteRepository @Inject constructor(
             },
         )
     }
+    suspend fun getNoteById(id: String) = noteDao.getNoteById(id)
 }

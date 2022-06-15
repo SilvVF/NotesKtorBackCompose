@@ -6,9 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.ktornotescompose.data.remote.BasicAuthInterceptor
 import com.example.ktornotescompose.ui.navigation.Routes
 import com.example.ktornotescompose.ui.screens.addeditnote.AddEditNoteScreen
@@ -36,8 +38,8 @@ class MainActivity: ComponentActivity() {
                 val scaffoldState = rememberScaffoldState()
                 Scaffold(
                     scaffoldState = scaffoldState
-                ) {
-                    it
+                ) { paddingValues ->
+                    paddingValues.toString()
                     NavHost(
                         navController = navController,
                         startDestination = if (isLoggedIn()) Routes.NOTES_ROUTE else Routes.AUTH_ROUTE
@@ -51,19 +53,27 @@ class MainActivity: ComponentActivity() {
                                 }
                             )
                         }
-                        composable(Routes.NOTES_ROUTE){
+                        composable(
+                            route = Routes.NOTES_ROUTE,
+                        ){
                             NoteScreen(
                                 scaffoldState = scaffoldState,
-                                onNoteClicked = {
-                                    navController.navigate(Routes.NOTE_DETAL_ROUTE)
+                                onNoteClicked = { noteID ->
+                                    navController.navigate(Routes.NOTE_DETAL_ROUTE + noteID)
                                 },
                                 onNavigate = { route ->
                                     navController.navigate(route)
                                 },
                             )
                         }
-                        composable(Routes.NOTE_DETAL_ROUTE){
-                            NoteDetailScreen(scaffoldState = scaffoldState)
+                        composable(
+                            route = Routes.NOTE_DETAL_ROUTE + "{noteID}",
+                                arguments = listOf(navArgument("noteID") { type = NavType.StringType })
+                        ) {
+                            val id = it.arguments?.getString("noteID") ?: ""
+                            NoteDetailScreen(
+                                scaffoldState = scaffoldState, noteID = id
+                            )
                         }
                         composable(Routes.ADD_EDIT_NOTE_ROUTE){
                             AddEditNoteScreen(scaffoldState = scaffoldState)

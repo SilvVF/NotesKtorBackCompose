@@ -9,4 +9,6 @@
     Click down to sign in!</string>
     <string name="all_notes">All Notes</string>
     <string name="synced">synced</string>
+    <string name="title">Title</string>
+    <string name="content">Note Content</string>
 </resources>
