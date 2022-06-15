@@ -4,7 +4,8 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -36,6 +37,7 @@ class MainActivity: ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState
                 ) {
+                    it
                     NavHost(
                         navController = navController,
                         startDestination = if (isLoggedIn()) Routes.NOTES_ROUTE else Routes.AUTH_ROUTE
@@ -48,12 +50,17 @@ class MainActivity: ComponentActivity() {
                                     navController.navigate(Routes.NOTES_ROUTE)
                                 }
                             )
-
                         }
                         composable(Routes.NOTES_ROUTE){
-                            NoteScreen(scaffoldState = scaffoldState) { route ->
-                                navController.navigate(route)
-                            }
+                            NoteScreen(
+                                scaffoldState = scaffoldState,
+                                onNoteClicked = {
+                                    navController.navigate(Routes.NOTE_DETAL_ROUTE)
+                                },
+                                onNavigate = { route ->
+                                    navController.navigate(route)
+                                },
+                            )
                         }
                         composable(Routes.NOTE_DETAL_ROUTE){
                             NoteDetailScreen(scaffoldState = scaffoldState)
