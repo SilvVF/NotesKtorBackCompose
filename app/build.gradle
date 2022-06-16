@@ -116,7 +116,7 @@ dependencies {
     implementation "io.noties.markwon:core:4.4.0"
 
     // Color Picker Dialog
-    //implementation "com.github.skydoves:colorpickerview:2.1.7"
+    implementation "com.github.skydoves:colorpicker-compose:1.0.0"
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 

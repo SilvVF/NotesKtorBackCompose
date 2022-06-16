@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.ktornotescompose.repositories.NoteRepository
 import com.example.ktornotescompose.ui.navigation.UiEvent
 import com.example.ktornotescompose.ui.navigation.UiText
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,7 +68,8 @@ class NoteViewModel @Inject constructor(
                     }
                     result.data?.let { notes ->
                         state = state.copy(
-                            notesList = notes
+                            notesList = notes,
+                            isRefreshing = false
                         )
                     }
                 }
@@ -77,12 +80,20 @@ class NoteViewModel @Inject constructor(
     fun onEvent(event: NoteScreenEvent) {
         when (event) {
             is NoteScreenEvent.OnFabButtonClick -> {
-
+                state = state.copy(isRefreshing = true)
+                viewModelScope.launch {
+                    _uiEvent.send(UiEvent.NavigateUp)
+                }
             }
             is NoteScreenEvent.OnMenuButtonClick -> {
                 state = state.copy(
                     isMenuDisplayed = !state.isMenuDisplayed
                 )
+            }
+            is NoteScreenEvent.OnRefreshTrigger -> {
+               viewModelScope.launch {
+                   _forceUpdate.emit(true)
+               }
             }
         }
     }
