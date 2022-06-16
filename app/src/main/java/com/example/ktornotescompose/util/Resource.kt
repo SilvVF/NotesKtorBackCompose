@@ -2,7 +2,7 @@ package com.example.ktornotescompose.util
 
 
 
-sealed class Resource<T>(
+sealed class Resource<out T>(
     val data: T? = null,
     val message: String? = null
 ) {

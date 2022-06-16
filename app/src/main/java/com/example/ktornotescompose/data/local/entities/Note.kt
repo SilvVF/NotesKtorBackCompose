@@ -16,5 +16,5 @@ data class Note(
     @PrimaryKey(autoGenerate = false)
     val id: String = UUID.randomUUID().toString(),
     @Expose(deserialize = false, serialize = false) //make sure that wont be included with any requests while parsing with retrofit
-    val isSynced: Boolean = false // is it synced with the server
+    var isSynced: Boolean = false // is it synced with the server
 )

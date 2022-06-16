@@ -14,7 +14,7 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline onFetchFailed: (Throwable) -> Unit = { Unit },
     //determine if you want to fetch data - by default always fetch
     crossinline shouldFetch: (ResultType) -> Boolean = { true }
-) = flow<Resource<ResultType>> {
+) = flow {
     emit(Resource.Loading(null))
     val data = query().first()
     val flow = if (shouldFetch(data)) {
