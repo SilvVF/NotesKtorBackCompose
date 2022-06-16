@@ -62,21 +62,32 @@ class MainActivity: ComponentActivity() {
                                     navController.navigate(Routes.NOTE_DETAL_ROUTE + noteID)
                                 },
                                 onNavigate = { route ->
-                                    navController.navigate(route)
+                                    navController.navigate(route + "null")
                                 },
                             )
                         }
                         composable(
                             route = Routes.NOTE_DETAL_ROUTE + "{noteID}",
-                                arguments = listOf(navArgument("noteID") { type = NavType.StringType })
+                            arguments = listOf(navArgument("noteID") { type = NavType.StringType })
                         ) {
                             val id = it.arguments?.getString("noteID") ?: ""
                             NoteDetailScreen(
-                                scaffoldState = scaffoldState, noteID = id
+                                scaffoldState = scaffoldState, noteID = id,
+                                navigateToEdit = { noteId ->
+                                    navController.popBackStack()
+                                    navController.navigate(Routes.ADD_EDIT_NOTE_ROUTE + noteId)
+                                }
                             )
                         }
-                        composable(Routes.ADD_EDIT_NOTE_ROUTE){
-                            AddEditNoteScreen(scaffoldState = scaffoldState)
+                        composable(
+                            route = Routes.ADD_EDIT_NOTE_ROUTE+ "{noteID}",
+                            arguments = listOf(navArgument("noteID") { type = NavType.StringType })
+                        ){
+                            val id = it.arguments?.getString("noteID") ?: ""
+                            AddEditNoteScreen(
+                                scaffoldState = scaffoldState,
+                                noteId = id
+                            )
                         }
                     }
                 }

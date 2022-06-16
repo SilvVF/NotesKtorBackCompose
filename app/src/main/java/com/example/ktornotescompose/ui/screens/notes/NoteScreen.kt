@@ -46,7 +46,9 @@ fun NoteScreen(
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is UiEvent.NavigateUp -> {}
+                is UiEvent.NavigateUp -> {
+                    onNavigate(Routes.ADD_EDIT_NOTE_ROUTE)
+                }
                 is UiEvent.ShowSnackBar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message.asString(context)
@@ -61,68 +63,70 @@ fun NoteScreen(
     }
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = state.isRefreshing),
-        onRefresh = { /*TODO*/ }
+        onRefresh = { viewModel.onEvent(NoteScreenEvent.OnRefreshTrigger) }
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            TopBar(
-                isMenuExpanded = state.isMenuDisplayed,
-                onMenuIconClick = {
-                    viewModel.onEvent(NoteScreenEvent.OnMenuButtonClick)
-                },
-                onLogoutClick = {
-                    viewModel.logout()
-                    onNavigate(Routes.AUTH_ROUTE)
-                }
-            )
-            Text(
-                text = stringResource(id = R.string.all_notes),
-                color = Color.White,
-                fontSize = 42.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.86f)
+        Box {
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(state.notesList) {
-                    NoteItem(
-                        note = it,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .shadow(
-                                elevation = 2.dp,
-                                shape = RoundedCornerShape(
-                                    topEnd = 7.dp,
-                                    bottomEnd = 7.dp
-                                )
-                            )
-                            .clip(
-                                RoundedCornerShape(
-                                    topEnd = 8.dp,
-                                    bottomEnd = 8.dp
-                                )
-                            )
-                            .height(80.dp)
-                            .fillMaxWidth()
-                    ) {
-                       onNoteClicked(it.id)
+                TopBar(
+                    isMenuExpanded = state.isMenuDisplayed,
+                    onMenuIconClick = {
+                        viewModel.onEvent(NoteScreenEvent.OnMenuButtonClick)
+                    },
+                    onLogoutClick = {
+                        viewModel.logout()
+                        onNavigate(Routes.AUTH_ROUTE)
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                )
+                Text(
+                    text = stringResource(id = R.string.all_notes),
+                    color = Color.White,
+                    fontSize = 42.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    items(state.notesList) {
+                        NoteItem(
+                            note = it,
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .shadow(
+                                    elevation = 2.dp,
+                                    shape = RoundedCornerShape(
+                                        topEnd = 7.dp,
+                                        bottomEnd = 7.dp
+                                    )
+                                )
+                                .clip(
+                                    RoundedCornerShape(
+                                        topEnd = 8.dp,
+                                        bottomEnd = 8.dp
+                                    )
+                                )
+                                .height(80.dp)
+                                .fillMaxWidth()
+                        ) {
+                            onNoteClicked(it.id)
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
             FloatingActionButton(
                 onClick = {
-
+                    viewModel.onEvent(NoteScreenEvent.OnFabButtonClick)
                 },
                 modifier = Modifier
                     .padding(16.dp)
-                    .align(Alignment.End)
+                    .align(Alignment.BottomEnd)
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }

@@ -7,5 +7,6 @@ data class AddEditNoteState(
     val note: Note? = null,
     val titleText: String = "",
     val contentText: String = "",
-    val color: Color = Color.Cyan
+    val color: Color = Color.Cyan,
+    val isColorPickerDisplayed: Boolean = false
 )
