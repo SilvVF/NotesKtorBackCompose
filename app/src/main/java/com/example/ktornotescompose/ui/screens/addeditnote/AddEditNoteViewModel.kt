@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ktornotescompose.data.local.entities.Note
 import com.example.ktornotescompose.repositories.NoteRepository
+import com.example.ktornotescompose.repositories.NoteRepositoryImpl
 import com.example.ktornotescompose.util.Event
 import com.example.ktornotescompose.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

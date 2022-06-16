@@ -1,29 +1,23 @@
 package com.example.ktornotescompose.ui.screens.auth
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ktornotescompose.data.remote.BasicAuthInterceptor
 import com.example.ktornotescompose.repositories.NoteRepository
 import com.example.ktornotescompose.ui.navigation.UiEvent
 import com.example.ktornotescompose.ui.navigation.UiText
-import com.example.ktornotescompose.util.Constants
 import com.example.ktornotescompose.util.Constants.KEY_LOGGED_IN_EMAIL
 import com.example.ktornotescompose.util.Constants.KEY_LOGGED_IN_PASSWORD
 import com.example.ktornotescompose.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.abs
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(

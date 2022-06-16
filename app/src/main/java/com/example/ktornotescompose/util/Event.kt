@@ -1,6 +1,6 @@
 package com.example.ktornotescompose.util
 
-open class Event<T>(val content: T) {
+open class Event<out T>(val content: T) {
 
     var hasBeenHandled: Boolean = false
         private set

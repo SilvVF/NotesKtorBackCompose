@@ -1,14 +1,18 @@
 package com.example.ktornotescompose.di
 
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.ktornotescompose.data.local.NoteDao
 import com.example.ktornotescompose.data.local.NotesDatabase
 import com.example.ktornotescompose.data.remote.BasicAuthInterceptor
 import com.example.ktornotescompose.data.remote.NoteApi
+import com.example.ktornotescompose.repositories.NoteRepository
+import com.example.ktornotescompose.repositories.NoteRepositoryImpl
 import com.example.ktornotescompose.util.Constants.BASE_URL
 import com.example.ktornotescompose.util.Constants.DATABASE_NAME
 import com.example.ktornotescompose.util.Constants.ENCRYPTED_SHARED_PREF
@@ -76,6 +80,20 @@ object AppModule {
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNoteRepository(
+        noteDao: NoteDao,
+        noteApi: NoteApi,
+        context: Application
+    ): NoteRepository {
+        return NoteRepositoryImpl(
+            noteDao = noteDao,
+            noteApi = noteApi,
+            context = context
         )
     }
 }
