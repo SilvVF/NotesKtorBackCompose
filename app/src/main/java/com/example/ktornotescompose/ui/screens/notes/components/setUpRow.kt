@@ -15,7 +15,7 @@ import com.example.ktornotescompose.data.local.entities.Note
 @Composable
 fun setUpRow(
     item: Note,
-    onClick: (Note) -> Unit
+    onClick: () -> Unit
 ){
     Row(
         modifier= Modifier
@@ -27,7 +27,7 @@ fun setUpRow(
         NoteItem(
             note = item,
             onClick = {
-                onClick(item)
+                onClick()
             }
         )
     }

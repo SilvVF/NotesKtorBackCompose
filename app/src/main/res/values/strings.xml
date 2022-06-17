@@ -11,4 +11,5 @@
     <string name="synced">synced</string>
     <string name="title">Title</string>
     <string name="content">Note Content</string>
+    <string name="deleted">Successfully deleted</string>
 </resources>

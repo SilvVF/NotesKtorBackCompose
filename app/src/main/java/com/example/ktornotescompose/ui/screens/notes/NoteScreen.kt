@@ -1,5 +1,6 @@
 package com.example.ktornotescompose.ui.screens.notes
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -15,9 +16,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +40,12 @@ import com.example.ktornotescompose.ui.screens.notes.components.TopBar
 import com.example.ktornotescompose.ui.screens.notes.components.setUpRow
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -60,15 +65,23 @@ fun NoteScreen(
                 }
                 is UiEvent.ShowSnackBar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.message.asString(context)
+                        message = event.message.asString(context),
                     )
                 }
-                else -> {}
+                is UiEvent.ShowSnackBarWithUndo -> {
+                    val res = scaffoldState.snackbarHostState.showSnackbar(
+                        message = "deleted",
+                        actionLabel = "Undo"
+                    )
+                    when (res) {
+                        SnackbarResult.ActionPerformed -> {
+                            viewModel.undoDeletion(event.data)
+                        }
+                        else -> { }
+                    }
+                }
             }
         }
-    }
-    LaunchedEffect(key1 = true){
-        viewModel.subscribeToNotes()
     }
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = state.isRefreshing),
@@ -97,18 +110,20 @@ fun NoteScreen(
                         .padding(8.dp)
                         .fillMaxWidth()
                 )
-                val dismissState = rememberDismissState()
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
                 ) {
-                    items(state.notesList,{notesList:Note -> notesList.id}){ item ->
-                        val dismissState = rememberDismissState()
-
-                        if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                            viewModel.onEvent(NoteScreenEvent.OnDismissNoteTrigger(item))
-                        }
+                    items(state.notesList){ item ->
+                        val dismissState = rememberDismissState(
+                            confirmStateChange = {
+                                if (it == DismissValue.DismissedToStart) {
+                                    viewModel.onEvent(NoteScreenEvent.OnDismissNoteTrigger(item))
+                                }
+                                true
+                            }
+                        )
                         SwipeToDismiss(
                             state = dismissState,
                             modifier = Modifier
@@ -146,26 +161,33 @@ fun NoteScreen(
                                         modifier = Modifier.scale(scale)
                                     )
                                 }
-                            },
-                            dismissContent = {
-                                Card(
-                                    elevation = animateDpAsState(
-                                        if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                                    ).value,
-                                    modifier = Modifier
-                                        .padding(end = 16.dp)
-                                        .fillMaxWidth()
-                                        .height(Dp(90f))
-                                        .clip(RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp))
-                                        .align(alignment = Alignment.CenterVertically)
-                                ) {
-                                    setUpRow(item = item) {
-                                        onNoteClicked(it.id)
-                                    }
+                            }
+                        ) {
+                            Card(
+                                elevation = animateDpAsState(
+                                    if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                                ).value,
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .fillMaxWidth()
+                                    .height(Dp(90f))
+                                    .clip(RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp))
+                                    .align(alignment = Alignment.CenterVertically)
+                                    .shadow(
+                                        elevation = 2.dp,
+                                        RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)
+                                    )
+                            ) {
+                                setUpRow(item = item) {
+                                    onNoteClicked(item.id)
                                 }
                             }
-                        )
-                        Spacer(Modifier.fillMaxWidth().height(8.dp))
+                            Spacer(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                            )
+                        }
                     }
                 }
             }
