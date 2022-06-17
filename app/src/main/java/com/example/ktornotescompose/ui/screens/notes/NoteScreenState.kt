@@ -5,16 +5,6 @@ import java.time.LocalDateTime
 
 data class NoteScreenState(
     val isMenuDisplayed: Boolean = false,
-    val notesList: List<Note> = listOf(
-        Note(
-            "Title",
-            "",
-            2423425,
-            emptyList(),
-            "345234",
-            "",
-            true
-        )
-    ),
-    val isRefreshing: Boolean = false
+    val notesList: List<Note> = emptyList(),
+    val isRefreshing: Boolean = false,
 )

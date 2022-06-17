@@ -2,6 +2,7 @@ package com.example.ktornotescompose.data.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.ktornotescompose.data.local.entities.LocallyDeletedNoteId
 import com.example.ktornotescompose.data.local.entities.Note
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,4 +37,13 @@ interface NoteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertListNotes(listNote: List<Note>)
+
+    @Query("SELECT * FROM locally_deleted_note_ids")
+    suspend fun getLocallyDeletedNoteIds(): List<LocallyDeletedNoteId>
+
+    @Query("DELETE FROM locally_deleted_note_ids WHERE deletedNoteId = :deletedNoteId")
+    suspend fun deleteLocallyDeletedNoteId(deletedNoteId: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLocallyDeletedNoteId(locallyDeletedNoteId: LocallyDeletedNoteId)
 }

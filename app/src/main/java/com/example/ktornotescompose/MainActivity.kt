@@ -62,7 +62,7 @@ class MainActivity: ComponentActivity() {
                                     navController.navigate(Routes.NOTE_DETAL_ROUTE + noteID)
                                 },
                                 onNavigate = { route ->
-                                    navController.navigate(route + "null")
+                                    navController.navigate(route)
                                 },
                             )
                         }

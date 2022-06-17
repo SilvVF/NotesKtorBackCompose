@@ -1,5 +1,6 @@
 package com.example.ktornotescompose.repositories
 
+import com.example.ktornotescompose.data.local.entities.LocallyDeletedNoteId
 import com.example.ktornotescompose.data.local.entities.Note
 import com.example.ktornotescompose.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -17,4 +18,6 @@ interface NoteRepository {
     fun getAllNotes(): Flow<Resource<List<Note>>>
 
     suspend fun getNoteById(id: String): Note?
+
+    suspend fun deleteNote(noteId: String)
 }

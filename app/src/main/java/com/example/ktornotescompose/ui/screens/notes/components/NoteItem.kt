@@ -50,7 +50,7 @@ fun NoteItem(
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .height(50.dp)
                     .offset(x = (-26).dp),
             ) {
 
@@ -62,7 +62,7 @@ fun NoteItem(
                     startAngle = -90f,
                     sweepAngle = 180f,
                     useCenter = true,
-                    size = Size(canvasWidth, 2 * canvasHeight)
+                    size = Size(canvasWidth, 2f * canvasHeight)
                 )
             }
         }

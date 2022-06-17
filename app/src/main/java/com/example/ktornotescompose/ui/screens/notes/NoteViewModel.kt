@@ -95,6 +95,14 @@ class NoteViewModel @Inject constructor(
                    _forceUpdate.emit(true)
                }
             }
+            is NoteScreenEvent.OnDismissNoteTrigger -> {
+                viewModelScope.launch {
+                    state = state.copy(
+                        notesList = state.notesList.filter { it.id != event.note.id }
+                    )
+                    repository.deleteNote(event.note.id)
+                }
+            }
         }
     }
 
