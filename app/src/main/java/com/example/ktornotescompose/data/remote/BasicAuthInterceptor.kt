@@ -1,6 +1,7 @@
 package com.example.ktornotescompose.data.remote
 
 import com.example.ktornotescompose.util.Constants.IGNORE_AUTH_URLS
+import com.example.ktornotescompose.util.checkForInternetConnection
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.Response

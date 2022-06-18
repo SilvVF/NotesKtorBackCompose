@@ -45,6 +45,7 @@ class AddEditNoteViewModel @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun insertNote(note: Note) = GlobalScope.launch {
         repository.insertNote(note)
+        Log.d("noteInsert", note.title)
     }
 
     fun subscribeToNoteUpdates() = viewModelScope.launch {

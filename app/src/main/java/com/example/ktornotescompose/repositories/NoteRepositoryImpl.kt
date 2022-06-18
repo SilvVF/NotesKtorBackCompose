@@ -11,6 +11,7 @@ import com.example.ktornotescompose.util.Resource
 import com.example.ktornotescompose.util.checkForInternetConnection
 import com.example.ktornotescompose.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 
 class NoteRepositoryImpl (
     private val noteDao: NoteDao,
@@ -57,29 +58,46 @@ class NoteRepositoryImpl (
         }
         //save the note locally in DB and set sync based on server response
         response?.let {
-            if (response.isSuccessful){
+            if (response.isSuccessful && response.body() != null){
                 noteDao.insert(note.apply { isSynced = true })
-            } else {
-                noteDao.insert(note.apply { isSynced = false })
             }
-        }
+        } ?: noteDao.insert(note.apply { isSynced = false })
     }
     override suspend fun insertNotes (noteList: List<Note>){
         noteList.forEach { insertNote(it) }
     }
+
+    private var currentNotesResponse: Response<List<Note>>? = null
+    override suspend fun syncNotes() {
+        //get list of locally deleted notes
+        val locallyDeletedNoteIds = noteDao.getLocallyDeletedNoteIds()
+        //delete the notes from the server
+        locallyDeletedNoteIds.forEach { id -> noteApi.deleteNote(DeleteNoteRequest(id.deletedNoteId)) }
+        // insert all notes that where made locally to the server
+        noteDao.getAllUnsyncedNotes().forEach { note -> insertNote(note) }
+        //get the notes currently on the server after sync
+        currentNotesResponse = noteApi.getNotes()
+        //check the response
+        currentNotesResponse?.body()?.let { notes ->
+            //clear the cached notes in the database
+            noteDao.deleteAllNotes()
+            //insert the list of synced noted from the server
+            insertNotes(notes.onEach { note -> note.isSynced = true })
+        }
+    }
+
     override fun getAllNotes(): Flow<Resource<List<Note>>> {
         return networkBoundResource(
             query = {
                 noteDao.getAllNotes()
             },
             fetch = {
-                noteApi.getNotes()
+                syncNotes()
+                currentNotesResponse
             },
             saveFetchResult = { response ->
-                if (response.isSuccessful) {
-                    response.body()?.let { notes ->
-                        insertNotes(notes)
-                    }
+                response?.body()?.let {
+                    insertNotes(it.onEach { note -> note.isSynced = true })
                 }
             },
             shouldFetch = {

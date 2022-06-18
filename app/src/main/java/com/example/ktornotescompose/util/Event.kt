@@ -5,7 +5,7 @@ open class Event<out T>(val content: T) {
     var hasBeenHandled: Boolean = false
         private set
 
-    private fun getContentIfNotHandled() =
+    fun getContentIfNotHandled() =
         if (hasBeenHandled) null
         else {
             hasBeenHandled = true
