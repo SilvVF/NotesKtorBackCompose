@@ -24,9 +24,6 @@ interface NoteDao {
     suspend fun deleteAllSyncedNotes()
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
-    fun observeNoteById(id: String): LiveData<Note>
-
-    @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: String): Note?
 
     @Query("SELECT * FROM notes ORDER BY date DESC")

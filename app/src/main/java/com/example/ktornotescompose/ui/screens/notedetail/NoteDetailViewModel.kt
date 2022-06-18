@@ -30,6 +30,4 @@ class NoteDetailViewModel @Inject constructor(
         }
     }
 
-
-
 }
