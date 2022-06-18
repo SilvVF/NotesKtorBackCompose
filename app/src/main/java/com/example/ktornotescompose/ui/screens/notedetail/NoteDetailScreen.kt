@@ -13,14 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.InspectableModifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ktornotescompose.R
 import com.example.ktornotescompose.ui.screens.addeditnote.AddEditNoteEvent
 import com.example.ktornotescompose.ui.screens.notes.components.HexToJetpackColor
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import java.nio.file.WatchEvent
 
 @Composable
@@ -46,8 +50,8 @@ fun NoteDetailScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = state.note.title,
+                MarkdownText(
+                    markdown = state.note.title,
                     fontSize = 42.sp,
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
@@ -81,10 +85,16 @@ fun NoteDetailScreen(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.TopStart
             ) {
-                Text(
-                    text = state.note.content
+                MarkdownText(
+                    markdown = """
+                        ${state.note.content}
+                    """,
+                    color = Color.White,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
