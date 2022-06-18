@@ -20,4 +20,6 @@ interface NoteRepository {
     suspend fun getNoteById(id: String): Note?
 
     suspend fun deleteNote(noteId: String)
+
+    suspend fun syncNotes()
 }

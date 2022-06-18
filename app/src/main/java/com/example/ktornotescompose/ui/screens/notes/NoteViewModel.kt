@@ -8,8 +8,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.*
 import com.example.ktornotescompose.R
 import com.example.ktornotescompose.data.local.entities.Note
 import com.example.ktornotescompose.repositories.NoteRepository
@@ -31,6 +31,7 @@ class NoteViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val repository: NoteRepository
 ): ViewModel() {
+
     private val _forceUpdate = MutableStateFlow(false)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _allNotes = _forceUpdate.flatMapLatest {
@@ -46,12 +47,7 @@ class NoteViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    init {
-        viewModelScope.launch {
-            subscribeToNotes()
-        }
-    }
-    private suspend fun subscribeToNotes() {
+    suspend fun subscribeToNotes() {
         allNotes.collect { event ->
             val result = event.peekContent()
             when (result) {
@@ -72,10 +68,12 @@ class NoteViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    event.content.message?.let { errorMessage ->
-                        _uiEvent.send(
-                            UiEvent.ShowSnackBar(UiText.DynamicString(errorMessage))
-                        )
+                    event.getContentIfNotHandled()?.let { errorMessage ->
+                        errorMessage.message?.let {
+                            _uiEvent.send(
+                                UiEvent.ShowSnackBar(UiText.DynamicString(it))
+                            )
+                        }
                     }
                     result.data?.let { notes ->
                         state = state.copy(

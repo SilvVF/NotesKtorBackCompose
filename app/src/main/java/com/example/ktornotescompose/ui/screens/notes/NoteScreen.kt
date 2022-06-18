@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -45,7 +46,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.lang.Math.random
 import java.util.*
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -83,6 +86,10 @@ fun NoteScreen(
             }
         }
     }
+    val owner =  LocalLifecycleOwner.current
+    LaunchedEffect(key1 = true) {
+        viewModel.subscribeToNotes()
+    }
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = state.isRefreshing),
         onRefresh = { viewModel.onEvent(NoteScreenEvent.OnRefreshTrigger) }
@@ -115,7 +122,10 @@ fun NoteScreen(
                         .fillMaxWidth()
                         .fillMaxHeight()
                 ) {
-                    items(state.notesList){ item ->
+                    items(
+                       items = state.notesList,
+                       key =  { noteItem: Note -> noteItem.id }
+                    ){ item ->
                         val dismissState = rememberDismissState(
                             confirmStateChange = {
                                 if (it == DismissValue.DismissedToStart) {

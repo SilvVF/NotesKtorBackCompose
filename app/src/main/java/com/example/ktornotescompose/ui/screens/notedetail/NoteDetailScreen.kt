@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,27 +51,33 @@ fun NoteDetailScreen(
                     fontSize = 42.sp,
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
-                        .border(
-                            BorderStroke(
-                                width = 1.dp,
-                                color = Color.Black
-                            )
-                        )
                         .padding(8.dp),
                 )
-
                 Canvas(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth()
+                        .offset(y = 5.dp)
                         .wrapContentHeight()
                 ) {
+                    drawCircle(
+                        color = Color.Black,
+                        radius = 95f,
+                    )
                     drawCircle(
                         color = HexToJetpackColor.getColor(state.note.color),
                         radius = 90f,
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                Modifier
+                    .padding(4.dp)
+                    .height(1.dp)
+                    .fillMaxWidth(0.7f)
+                    .border(1.dp, Color.Black).padding(4.dp)
+            ) {}
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -83,7 +90,9 @@ fun NoteDetailScreen(
         }
         FloatingActionButton(
             onClick = { navigateToEdit(noteID) },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Edit ,
