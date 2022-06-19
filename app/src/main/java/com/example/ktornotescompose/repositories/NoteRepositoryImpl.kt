@@ -6,6 +6,7 @@ import com.example.ktornotescompose.data.local.entities.LocallyDeletedNoteId
 import com.example.ktornotescompose.data.local.entities.Note
 import com.example.ktornotescompose.data.remote.NoteApi
 import com.example.ktornotescompose.data.remote.requests.AccountRequest
+import com.example.ktornotescompose.data.remote.requests.AddOwnerRequest
 import com.example.ktornotescompose.data.remote.requests.DeleteNoteRequest
 import com.example.ktornotescompose.util.Resource
 import com.example.ktornotescompose.util.checkForInternetConnection
@@ -21,6 +22,22 @@ class NoteRepositoryImpl (
     override suspend fun loginUser(email: String, password: String): Resource<String>  {
         try {
             val response = noteApi.login(AccountRequest(email = email, password = password))
+            if (response.isSuccessful && response.body()!!.successful) {
+                response.body()?.message?.let {
+                    return Resource.Success(it)
+                }
+            } else {
+                return Resource.Error(response.message(), null)
+            }
+        }catch (e: Exception) {
+            return Resource.Error("Couldn't connect to the server check internet", null)
+        }
+        return Resource.Error("Couldn't connect to the server check internet", null)
+    }
+
+    override suspend fun addOwnerToNote(noteId: String, owner: String): Resource<String>  {
+        try {
+            val response = noteApi.addOwnerToNote(AddOwnerRequest(noteId, owner))
             if (response.isSuccessful && response.body()!!.successful) {
                 response.body()?.message?.let {
                     return Resource.Success(it)
