@@ -22,4 +22,6 @@ interface NoteRepository {
     suspend fun deleteNote(noteId: String)
 
     suspend fun syncNotes()
+
+    suspend fun addOwnerToNote(noteId: String, owner: String): Resource<String>
 }
